@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { styled } from 'styled-components'
 
 const ProjectsContainer = styled.div`
@@ -59,6 +60,29 @@ const Tag = styled.span`
   font-size: 0.8rem;
 `
 
+const OverlayBackground = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+`
+
+const OverlayContent = styled.div`
+  background-color: rgba(21, 16, 48, 0.95);
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+`
+
 const Projects = () => {
   const projects = [
     {
@@ -77,13 +101,17 @@ const Projects = () => {
       tags: ['Three.js', 'React', 'TypeScript']
     }
   ];
-  
+
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const handleClose = () => setActiveIndex(null);
+
   return (
     <ProjectsContainer>
       <Title>My Projects</Title>
       <ProjectsGrid>
         {projects.map((project, index) => (
-          <ProjectCard key={index}>
+          <ProjectCard key={index} onClick={() => setActiveIndex(index)}>
             <ProjectTitle>{project.title}</ProjectTitle>
             <ProjectDescription>{project.description}</ProjectDescription>
             <TagsContainer>
@@ -94,6 +122,21 @@ const Projects = () => {
           </ProjectCard>
         ))}
       </ProjectsGrid>
+      {activeIndex !== null && (
+        <OverlayBackground onClick={handleClose}>
+          <OverlayContent onClick={(e) => e.stopPropagation()}>
+            <ProjectTitle>{projects[activeIndex].title}</ProjectTitle>
+            <ProjectDescription>
+              {projects[activeIndex].description}
+            </ProjectDescription>
+            <TagsContainer>
+              {projects[activeIndex].tags.map((tag, i) => (
+                <Tag key={i}>{tag}</Tag>
+              ))}
+            </TagsContainer>
+          </OverlayContent>
+        </OverlayBackground>
+      )}
     </ProjectsContainer>
   )
 }
