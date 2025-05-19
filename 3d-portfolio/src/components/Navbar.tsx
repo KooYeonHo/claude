@@ -64,6 +64,9 @@ const Navbar = () => {
         <StyledNavLink to="/contact">
           Contact
         </StyledNavLink>
+        <StyledNavLink to="/example">
+          Example
+        </StyledNavLink>
       </NavLinks>
     </NavContainer>
   );

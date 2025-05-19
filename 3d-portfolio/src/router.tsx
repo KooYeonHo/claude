@@ -4,6 +4,7 @@ import LandingPage from './pages/LandingPage';
 import AboutMe from './pages/AboutMe';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
+import Example3D from './pages/Example3D';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: 'contact',
         element: <Contact />
+      },
+      {
+        path: 'example',
+        element: <Example3D />
       }
     ]
   },
