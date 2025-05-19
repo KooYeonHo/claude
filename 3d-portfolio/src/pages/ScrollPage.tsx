@@ -9,6 +9,7 @@ const ScrollContainer = styled.div`
   height: 100vh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 `;
 
 const Section = styled.section`

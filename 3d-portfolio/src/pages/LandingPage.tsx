@@ -18,17 +18,29 @@ const Overlay = styled.div`
   pointer-events: none;
 `
 
+const LandingWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100vh;
+`
+
 const Title = styled.h1`
   font-size: 4rem;
   margin: 0;
   background: linear-gradient(90deg, #ffa500, #8352fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
 `
 
 const Subtitle = styled.p`
   font-size: 1.2rem;
   color: #aaa6c3;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `
 
 const DodecahedronCage = () => {
@@ -84,7 +96,7 @@ const MovingBalls = ({ radius = 1.8 }) => {
 
 const LandingPage = () => {
   return (
-    <>
+    <LandingWrapper>
       <Overlay>
         <Title>Welcome to My Portfolio</Title>
         <Subtitle>Crafting immersive 3D web experiences</Subtitle>
@@ -110,7 +122,7 @@ const LandingPage = () => {
         <OrbitControls enableZoom={false} />
         <Preload all />
       </StyledCanvas>
-    </>
+    </LandingWrapper>
   )
 }
 
