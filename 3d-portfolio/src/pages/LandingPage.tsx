@@ -31,19 +31,54 @@ const Subtitle = styled.p`
   color: #aaa6c3;
 `
 
-const RotatingTorus = () => {
+const DodecahedronCage = () => {
   const ref = useRef<THREE.Mesh>(null)
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (ref.current) {
-      ref.current.rotation.x += 0.005
-      ref.current.rotation.y += 0.01
+      ref.current.rotation.x += delta * 0.3
+      ref.current.rotation.y += delta * 0.2
     }
   })
   return (
     <mesh ref={ref}>
-      <torusKnotGeometry args={[2, 0.6, 128, 32]} />
-      <meshStandardMaterial color="#8352FD" roughness={0.2} metalness={0.7} />
+      <dodecahedronGeometry args={[2]} />
+      <meshStandardMaterial color="#8352FD" wireframe />
     </mesh>
+  )
+}
+
+const BALL_COUNT = 6
+
+const MovingBalls = ({ radius = 1.8 }) => {
+  const balls = useRef<THREE.Mesh[]>([])
+  const velocities = useRef(
+    Array.from({ length: BALL_COUNT }, () =>
+      new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
+        .normalize()
+        .multiplyScalar(0.02)
+    )
+  )
+
+  useFrame((_, delta) => {
+    balls.current.forEach((ball, i) => {
+      const v = velocities.current[i]
+      ball.position.addScaledVector(v, delta * 60)
+      if (ball.position.length() > radius) {
+        ball.position.clampLength(0, radius)
+        v.reflect(ball.position.clone().normalize())
+      }
+    })
+  })
+
+  return (
+    <>
+      {Array.from({ length: BALL_COUNT }).map((_, i) => (
+        <mesh ref={(el) => (balls.current[i] = el!)} key={i}>
+          <sphereGeometry args={[0.2, 16, 16]} />
+          <meshStandardMaterial color="#E91E63" />
+        </mesh>
+      ))}
+    </>
   )
 }
 
@@ -61,7 +96,8 @@ const LandingPage = () => {
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[0, 0, 5]} intensity={1} />
-        <RotatingTorus />
+        <DodecahedronCage />
+        <MovingBalls />
         <Text
           position={[0, -3, 0]}
           fontSize={0.5}
