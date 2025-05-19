@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Preload } from '@react-three/drei'
+import { OrbitControls, Preload, Stars } from '@react-three/drei'
 import { styled } from 'styled-components'
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import * as THREE from 'three'
 
 const StyledCanvas = styled(Canvas)`
@@ -23,6 +23,31 @@ function DodecahedronCage() {
     <mesh ref={meshRef}>
       <dodecahedronGeometry args={[2]} />
       <meshStandardMaterial color="#2196F3" wireframe />
+    </mesh>
+  )
+}
+
+function InteractiveCube() {
+  const meshRef = useRef<THREE.Mesh>(null)
+  const [active, setActive] = useState(false)
+
+  useFrame((_, delta) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x += delta * 0.5
+      meshRef.current.rotation.y += delta * 0.5
+    }
+  })
+
+  return (
+    <mesh
+      ref={meshRef}
+      position={[0, 0, 0]}
+      onClick={() => setActive(!active)}
+      onPointerOver={() => setActive(true)}
+      onPointerOut={() => setActive(false)}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={active ? '#E91E63' : '#2196F3'} />
     </mesh>
   )
 }
@@ -86,10 +111,12 @@ function MovingBalls({ radius = 1.8 }) {
 const Example3D = () => {
   return (
     <StyledCanvas camera={{ position: [0, 0, 5], fov: 45 }} shadows>
+      <Stars radius={5} depth={20} count={2000} factor={4} fade />
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 2, 2]} intensity={1} />
       <DodecahedronCage />
       <MovingBalls />
+      <InteractiveCube />
       <OrbitControls />
       <Preload all />
     </StyledCanvas>
