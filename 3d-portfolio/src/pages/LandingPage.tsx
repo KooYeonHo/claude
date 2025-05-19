@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Preload, Text } from '@react-three/drei'
 import { styled } from 'styled-components'
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
 const StyledCanvas = styled(Canvas)`
@@ -60,6 +60,7 @@ const DodecahedronCage = () => {
 }
 
 const BALL_COUNT = 6
+const BALL_RADIUS = 0.2
 
 const MovingBalls = ({ radius = 1.8 }) => {
   const balls = useRef<THREE.Mesh[]>([])
@@ -71,14 +72,34 @@ const MovingBalls = ({ radius = 1.8 }) => {
     )
   )
 
+  const planes = useMemo(() => {
+    const g = new THREE.DodecahedronGeometry(radius)
+    const pos = g.getAttribute('position')
+    const p: THREE.Plane[] = []
+    for (let i = 0; i < pos.count; i += 3) {
+      const vA = new THREE.Vector3().fromBufferAttribute(pos, i)
+      const vB = new THREE.Vector3().fromBufferAttribute(pos, i + 1)
+      const vC = new THREE.Vector3().fromBufferAttribute(pos, i + 2)
+      const normal = new THREE.Triangle(vA, vB, vC).getNormal(new THREE.Vector3())
+      const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, vA)
+      if (!p.some((pl) => pl.normal.angleTo(plane.normal) < 0.01)) {
+        p.push(plane)
+      }
+    }
+    return p
+  }, [radius])
+
   useFrame((_, delta) => {
     balls.current.forEach((ball, i) => {
       const v = velocities.current[i]
       ball.position.addScaledVector(v, delta * 60)
-      if (ball.position.length() > radius) {
-        ball.position.clampLength(0, radius)
-        v.reflect(ball.position.clone().normalize())
-      }
+      planes.forEach((plane) => {
+        const dist = plane.distanceToPoint(ball.position) + BALL_RADIUS
+        if (dist > 0) {
+          ball.position.addScaledVector(plane.normal, -dist)
+          v.reflect(plane.normal)
+        }
+      })
     })
   })
 
@@ -86,7 +107,7 @@ const MovingBalls = ({ radius = 1.8 }) => {
     <>
       {Array.from({ length: BALL_COUNT }).map((_, i) => (
         <mesh ref={(el) => (balls.current[i] = el!)} key={i}>
-          <sphereGeometry args={[0.2, 16, 16]} />
+          <sphereGeometry args={[BALL_RADIUS, 16, 16]} />
           <meshStandardMaterial color="#E91E63" />
         </mesh>
       ))}
