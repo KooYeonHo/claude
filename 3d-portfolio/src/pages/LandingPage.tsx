@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Preload, Text } from '@react-three/drei'
+import { OrbitControls, Preload, Text, Stars } from '@react-three/drei'
 import { styled } from 'styled-components'
 import { useRef, useMemo } from 'react'
 import * as THREE from 'three'
@@ -127,6 +127,7 @@ const LandingPage = () => {
         camera={{ position: [0, 0, 8], fov: 30 }}
         gl={{ preserveDrawingBuffer: true }}
       >
+        <Stars radius={5} depth={20} count={2000} factor={4} fade />
         <ambientLight intensity={0.6} />
         <directionalLight position={[0, 0, 5]} intensity={1} />
         <DodecahedronCage />
