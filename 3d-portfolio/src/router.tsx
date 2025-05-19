@@ -5,6 +5,7 @@ import AboutMe from './pages/AboutMe';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import Example3D from './pages/Example3D';
+import ScrollPage from './pages/ScrollPage';
 
 const router = createBrowserRouter([
   {
@@ -28,8 +29,12 @@ const router = createBrowserRouter([
         element: <Contact />
       },
       {
-        path: 'example',
-        element: <Example3D />
+      path: 'example',
+      element: <Example3D />
+      },
+      {
+        path: 'scroll',
+        element: <ScrollPage />
       }
     ]
   },

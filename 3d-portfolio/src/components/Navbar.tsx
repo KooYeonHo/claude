@@ -67,6 +67,9 @@ const Navbar = () => {
         <StyledNavLink to="/example">
           Example
         </StyledNavLink>
+        <StyledNavLink to="/scroll">
+          Scroll
+        </StyledNavLink>
       </NavLinks>
     </NavContainer>
   );
