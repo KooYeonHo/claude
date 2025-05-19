@@ -6,10 +6,8 @@ import Example3D from './Example3D'
 import { styled } from 'styled-components'
 
 const ScrollContainer = styled.div`
-  height: 100vh;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Section = styled.section`
