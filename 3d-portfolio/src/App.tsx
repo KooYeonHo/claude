@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { styled } from 'styled-components'
 import Navbar from './components/Navbar'
+// import GenerativeArtBackground from './components/GenerativeArtBackground'; // Removed
 
 const AppContainer = styled.div`
   width: 100%;
@@ -17,6 +18,7 @@ const ContentContainer = styled.div`
 function App() {
   return (
     <AppContainer>
+      {/* <GenerativeArtBackground /> // Removed */}
       <Navbar />
       <ContentContainer>
         <Outlet />
