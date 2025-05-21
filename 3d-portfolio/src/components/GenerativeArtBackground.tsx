@@ -68,7 +68,7 @@ const Particles: React.FC<ParticlesProps> = ({ count, baseColor, animationSpeed 
     return new Float32Array(temp);
   }, [count, baseColor]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => { // Changed 'state' to '_state'
     if (pointsRef.current) {
       pointsRef.current.rotation.y += delta * animationSpeed * 0.1;
       pointsRef.current.rotation.x += delta * animationSpeed * 0.05;
@@ -99,7 +99,7 @@ const Particles: React.FC<ParticlesProps> = ({ count, baseColor, animationSpeed 
   });
 
   return (
-    <Points ref={pointsRef} positions={particles} stride={3}>
+    <Points ref={pointsRef} positions={particles} colors={colors} stride={3}> {/* Added colors={colors} prop */}
       <PointMaterial
         transparent
         vertexColors

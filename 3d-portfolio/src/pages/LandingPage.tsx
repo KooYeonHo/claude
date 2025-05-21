@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
+import { useState, useLayoutEffect, useRef, useMemo } from 'react'; // Removed React default import
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Preload, Text, Stars } from '@react-three/drei';
 import { styled } from 'styled-components';
@@ -289,71 +289,89 @@ const LandingPage = () => {
   useLayoutEffect(() => {
     ScrollTrigger.refresh();
     
+    // Proxies need to be defined before createTimeline if it's defined inside useLayoutEffect
+    // and uses these proxies from its closure.
+    let introColorProxy = { r: new THREE.Color(bgColor).r, g: new THREE.Color(bgColor).g, b: new THREE.Color(bgColor).b };
+    let speedProxy = { value: bgAnimationSpeed };
+    let particleCountProxy = { value: bgParticleCount };
+
     const introSectionTrigger = document.getElementById('intro-section');
     const aboutSectionTrigger = document.getElementById('about-section');
     const skillsSectionTrigger = document.getElementById('skills-section');
     const projectsSectionTrigger = document.getElementById('projects-section');
     const contactSectionTrigger = document.getElementById('contact-section');
 
-    // Color proxy for intro section
-    let introColorProxy = { r: new THREE.Color(bgColor).r, g: new THREE.Color(bgColor).g, b: new THREE.Color(bgColor).b };
+    // Define target colors (remains the same)
     const introTargetColor = new THREE.Color('#228B22'); 
     const aboutTargetColor = new THREE.Color('#556B2F'); 
     const skillsTargetColor = new THREE.Color('#3CB371'); 
     const projectsTargetColor = new THREE.Color('#20B2AA'); 
-    const contactTargetColor = new THREE.Color('#1E4D2B'); // Calm, deep green
+    const contactTargetColor = new THREE.Color('#1E4D2B');
     
-    // Speed proxy
-    let speedProxy = { value: bgAnimationSpeed };
+    // Define target speeds (remains the same)
     const aboutTargetSpeed = 0.02; 
     const skillsTargetSpeed = 0.05; 
     const projectsTargetSpeed = 0.08; 
-    const contactTargetSpeed = 0.01; // Very slow
+    const contactTargetSpeed = 0.01;
 
-    // Particle count proxy
-    let particleCountProxy = { value: bgParticleCount };
+    // Define target particle counts (remains the same)
     const skillsTargetParticleCount = 800;
     const projectsTargetParticleCount = 600;
-    const contactTargetParticleCount = 500; // Moderate count
+    const contactTargetParticleCount = 500;
 
-    const createTimeline = (trigger, targetColor, targetSpeed, targetParticles) => {
+    // Define createTimeline INSIDE useLayoutEffect to close over proxies and setters
+    const createTimeline = (
+      trigger: HTMLElement | null,
+      targetColor: THREE.Color,
+      targetSpeed?: number,
+      targetParticles?: number
+    ): gsap.core.Timeline | null => { // Added return type
       if (!trigger) return null;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger,
           start: 'top center',
           end: 'bottom center',
           scrub: 1,
-          // markers: true // Generic marker for debugging, customize if needed
+          // markers: true 
         },
       });
-      tl.to(introColorProxy, {
+
+      // Animate color (always present)
+      tl.to(introColorProxy, { // introColorProxy is used for all color animations
         r: targetColor.r, g: targetColor.g, b: targetColor.b,
         onUpdate: () => setBgColor(new THREE.Color(introColorProxy.r, introColorProxy.g, introColorProxy.b).getStyle()),
       });
+
+      // Animate speed if targetSpeed is provided
       if (targetSpeed !== undefined) {
         tl.to(speedProxy, {
           value: targetSpeed,
           onUpdate: () => setBgAnimationSpeed(speedProxy.value),
-        }, 0);
+        }, 0); // Run concurrently with color change
       }
+
+      // Animate particle count if targetParticles is provided
       if (targetParticles !== undefined) {
         tl.to(particleCountProxy, {
           value: targetParticles,
           onUpdate: () => setBgParticleCount(Math.round(particleCountProxy.value)),
-        }, 0);
+        }, 0); // Run concurrently
       }
+      
       return tl;
     };
 
-    const introTl = createTimeline(introSectionTrigger, introTargetColor);
-    const aboutTl = createTimeline(aboutSectionTrigger, aboutTargetColor, aboutTargetSpeed);
+    // Updated calls to createTimeline
+    const introTl = createTimeline(introSectionTrigger, introTargetColor, undefined, undefined);
+    const aboutTl = createTimeline(aboutSectionTrigger, aboutTargetColor, aboutTargetSpeed, undefined);
     const skillsTl = createTimeline(skillsSectionTrigger, skillsTargetColor, skillsTargetSpeed, skillsTargetParticleCount);
     const projectsTl = createTimeline(projectsSectionTrigger, projectsTargetColor, projectsTargetSpeed, projectsTargetParticleCount);
     const contactTl = createTimeline(contactSectionTrigger, contactTargetColor, contactTargetSpeed, contactTargetParticleCount);
 
-
     return () => {
+      // Cleanup remains the same
       [introTl, aboutTl, skillsTl, projectsTl, contactTl].forEach(tl => tl && tl.kill());
       [introSectionTrigger, aboutSectionTrigger, skillsSectionTrigger, projectsSectionTrigger, contactSectionTrigger].forEach(triggerEl => {
         if (triggerEl) {
